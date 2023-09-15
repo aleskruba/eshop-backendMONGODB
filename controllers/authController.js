@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer');
+const mongoose = require('mongoose');
 
 
 const createToken = (id) => {
@@ -339,3 +340,69 @@ module.exports.getProductsAdmin = async (req, res, next) => {
     next(); // Move to the next middleware
   }
 };
+
+
+
+module.exports.getUserADMIN = async (req, res, next) => {
+  const token = req.cookies.jwt;
+  const userID = req.query.id; // Use req.query to access query parameters
+
+
+  if (token) {
+    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+      if (err) {
+        res.locals.user = null;
+        next(); // Move to the next middleware in case of an error
+      } else {
+          const adminID = decodedToken._id
+        try {
+          const user = await User.findById(new mongoose.Types.ObjectId(userID));
+          res.locals.user = user;
+          res.status(201).json({ user: user });
+        } catch (err) {
+          res.status(400).send(err.message); // Send the error response with status 400
+        }
+      }
+    });
+  } else {
+    res.locals.user = null;
+    next(); // Move to the next middleware
+  }
+};
+
+module.exports.updateUserADMIN_put = async (req, res, next) => {
+  const data = req.body.data;
+  const token = req.cookies.jwt;
+  const userID = req.body.userID;
+
+ {
+  if (token) {
+    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+      if (err) {
+        res.locals.user = null;
+        next(); // Move to the next middleware in case of an error
+      } else {
+        try {
+          const adminID = await User.findById(decodedToken.id);
+          const user = await User.findById(new mongoose.Types.ObjectId(userID));
+          res.locals.user = user;
+
+          await User.updateOne(
+            { _id: user._id },
+            { $set:  data  }
+          );
+          res.status(200).json({ message: 'updated successfully' });
+     
+        } catch (err) {
+          res.status(400).json({ error: err.message });
+        }
+      }
+    });
+  } else {
+    res.locals.user = null;
+    next(); // Move to the next middleware
+  }
+} 
+};
+
+

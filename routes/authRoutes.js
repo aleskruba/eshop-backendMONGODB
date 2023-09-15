@@ -41,6 +41,9 @@ router.get('/checkuser', checkUser, (req, res) => {
 
 //admin 
 router.get('/getusers',requireADMINAuth,authController.getUsers) 
+router.get('/getuserADMIN',requireADMINAuth,authController.getUserADMIN) 
+router.put('/updateuserADMIN',requireADMINAuth,authController.updateUserADMIN_put) 
+
 router.get('/getproductsAdmin',requireADMINAuth,authController.getProductsAdmin) 
 
 module.exports = router;

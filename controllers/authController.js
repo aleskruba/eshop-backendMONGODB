@@ -406,3 +406,46 @@ module.exports.updateUserADMIN_put = async (req, res, next) => {
 };
 
 
+
+
+module.exports.changepasswordADMIN = async (req, res, next) => {
+  const newPassword  = req.body.newPassword;
+  const userID = req.body.userID;
+  const token = req.cookies.jwt;
+
+   if (token) {
+    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+      if (err) {
+        res.locals.user = null;
+        next();
+      } else {
+            const adminID = await User.findById(decodedToken.id);
+            const user = await User.findById(new mongoose.Types.ObjectId(userID));
+            res.locals.user = user;
+            try {
+     
+          if (newPassword.length < 6) {
+            throw new Error('incorrect new password');
+          }
+
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+          await User.updateOne({ _id: user._id}, { password: hashedPassword });
+          
+          res.status(200).json({ message: 'password updated successfully' });
+          return; // Add the return statement here to stop execution
+        } catch (err) {
+          res.status(400).send(err.message); // Send the error response with status 400
+          return; // Add the return statement here to stop execution
+        }
+
+      }
+    });
+  } else {
+    res.locals.user = null;
+    next();
+  }   
+};
+
+
+

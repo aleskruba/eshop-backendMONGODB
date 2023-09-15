@@ -44,6 +44,8 @@ router.get('/getusers',requireADMINAuth,authController.getUsers)
 router.get('/getuserADMIN',requireADMINAuth,authController.getUserADMIN) 
 router.put('/updateuserADMIN',requireADMINAuth,authController.updateUserADMIN_put) 
 
+router.put('/changepasswordADMIN',requireADMINAuth,authController.changepasswordADMIN) 
+
 router.get('/getproductsAdmin',requireADMINAuth,authController.getProductsAdmin) 
 
 module.exports = router;

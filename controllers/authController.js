@@ -72,7 +72,6 @@ module.exports.login_post = async (req, res) => {
     res.status(200).json({ user: user._id , userData:user});
   } catch (err) {
     res.status(400).json({ error: 'wrong email or password' }); // Send specific error details
-    // No need for a generic error handler here
   }
 };
 
@@ -94,36 +93,30 @@ module.exports.fpassword_post = async (req, res) => {
   const { email } = req.body;
 
   try {
-   
-
-    // Access the OTP from the session
     const otp = req.session.otp.value;
-    // Your other code to send the OTP via email goes here...
+
     let transporter = nodemailer.createTransport({
       host: 'smtp.centrum.cz',
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.EMAILUSER, // your email address
-        pass: process.env.EMAILPASSWORD, // your email password
+        user: process.env.EMAILUSER, 
+        pass: process.env.EMAILPASSWORD, 
       },
     });
 
     let mailOptions = {
       from: process.env.EMAILUSER, // sender address
-      to: email, // list of receivers
-      subject: 'TEST ZAPOMENUTÉHO HESLA', // Subject line
-      text: ` ${email}, NOVÝ KÓD ${otp}`, // plain text body
-      html: `<b>${otp}</b>`, // html body
+      to: email, 
+      subject: 'TEST ZAPOMENUTÉHO HESLA', 
+      text: ` ${email}, NOVÝ KÓD ${otp}`, 
+      html: `<b>${otp}</b>`, 
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log(error);
-        // Handle the error here if needed
         res.status(500).json({ error: 'Email sending failed' });
       } else {
-        // Success response
         res.status(200).json({ message: 'OTP sent successfully!' });
       }
     });
@@ -141,11 +134,9 @@ module.exports.verifyOTP_post = async (req, res) => {
     const storedOTP = req.session.otp;
 
     if (storedOTP.value === code && Date.now() < storedOTP.expires) {
-      // OTP is valid and not expired
       req.session.isAuthenticated = true;
       res.status(200).json({ message: 'OTP verified successfully!' });
     } else {
-      // OTP is invalid or expired
       res.status(401).json({ error: 'Invalid OTP or session expired.' });
     }
   } catch (err) {
@@ -175,7 +166,6 @@ try {
   const hashedPassword = await bcrypt.hash(password, 10);
   const updatedUser = await User.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
 
-  // Send the response before destroying the session
   res.status(200).json({ user: updatedUser._id });
 
 
@@ -194,11 +184,9 @@ module.exports.changePassword_post = async (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
       if (err) {
-        res.locals.user = null;
         next();
       } else {
         let user = await User.findById(decodedToken.id);
-        res.locals.user = user;
         try {
           const passwordMatch = await bcrypt.compare(oldPassword, user.password);
           if (!passwordMatch) {
@@ -213,17 +201,16 @@ module.exports.changePassword_post = async (req, res, next) => {
 
           await User.updateOne({ _id: user._id }, { password: hashedPassword });
           res.status(201).json({ user: 'password changed' });
-          return; // Add the return statement here to stop execution
+          return; 
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
-          return; // Add the return statement here to stop execution
+          res.status(400).send(err.message);
+          return; 
         }
 
       }
     });
   } else {
-    res.locals.user = null;
-    next();
+      next();
   } 
 };
 
@@ -236,21 +223,19 @@ module.exports.getUser = async (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next();
       } else {
         let user = await User.findById(decodedToken.id);
-        res.locals.user = user;
-                try {
+        try {
           res.status(201).json({ user: user });
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
+          res.status(400).send(err.message);
         }
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).send({ error: 'Unauthorized' });
+    next();
   }
 };
 
@@ -262,32 +247,33 @@ module.exports.updateUser_put = async (req, res, next) => {
   const data = req.body.data;
   const token = req.cookies.jwt;
 
-
   if (token) {
     jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next(); 
       } else {
         try {
           const user = await User.findById(decodedToken.id);
-   
-          await User.updateOne(
-            { _id: user._id },
-            { $set:  data  }
-          );
-          res.status(200).json({ message: 'updated successfully' });
-     
+
+          if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+          }
+
+          await User.updateOne({ _id: user._id }, { $set: data });
+
+          res.status(200).json({ message: 'Updated successfully' });
         } catch (err) {
           res.status(400).json({ error: err.message });
         }
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).json({ error: 'Unauthorized' });
+    next(); 
   }
 };
+
 
 
 //admin
@@ -297,22 +283,21 @@ module.exports.getUsers = async (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (token) {
-    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+    jwt.verify(token, process.env.KEY, async (err) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next(); 
       } else {
         let users = await User.find({});
       try {
           res.status(201).json({ users: users });
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
+          res.status(400).send(err.message); 
         }
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).json({ error: 'Unauthorized' });
+    next(); 
   }
 };
 
@@ -322,22 +307,21 @@ module.exports.getProductsAdmin = async (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (token) {
-    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+    jwt.verify(token, process.env.KEY, async (err) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next(); 
       } else {
         let products = await Product.find({});
       try {
           res.status(201).json({ products: products });
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
+          res.status(400).send(err.message); 
         }
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).json({ error: 'Unauthorized' });
+    next();
   }
 };
 
@@ -345,28 +329,26 @@ module.exports.getProductsAdmin = async (req, res, next) => {
 
 module.exports.getUserADMIN = async (req, res, next) => {
   const token = req.cookies.jwt;
-  const userID = req.query.id; // Use req.query to access query parameters
+  const userID = req.query.id; 
 
 
   if (token) {
-    jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
+    jwt.verify(token, process.env.KEY, async (err) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next(); 
       } else {
-          const adminID = decodedToken._id
-        try {
+          try {
           const user = await User.findById(new mongoose.Types.ObjectId(userID));
           res.locals.user = user;
           res.status(201).json({ user: user });
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
+          res.status(400).send(err.message); 
         }
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).json({ error: 'Unauthorized' });
+    next(); 
   }
 };
 
@@ -379,14 +361,11 @@ module.exports.updateUserADMIN_put = async (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
       if (err) {
-        res.locals.user = null;
-        next(); // Move to the next middleware in case of an error
+        next(); 
       } else {
         try {
-          const adminID = await User.findById(decodedToken.id);
           const user = await User.findById(new mongoose.Types.ObjectId(userID));
-          res.locals.user = user;
-
+  
           await User.updateOne(
             { _id: user._id },
             { $set:  data  }
@@ -399,8 +378,8 @@ module.exports.updateUserADMIN_put = async (req, res, next) => {
       }
     });
   } else {
-    res.locals.user = null;
-    next(); // Move to the next middleware
+    res.status(401).json({ error: 'Unauthorized' });
+    next(); 
   }
 } 
 };
@@ -416,13 +395,10 @@ module.exports.changepasswordADMIN = async (req, res, next) => {
    if (token) {
     jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
       if (err) {
-        res.locals.user = null;
-        next();
+         next();
       } else {
-            const adminID = await User.findById(decodedToken.id);
             const user = await User.findById(new mongoose.Types.ObjectId(userID));
-            res.locals.user = user;
-            try {
+           try {
      
           if (newPassword.length < 6) {
             throw new Error('incorrect new password');
@@ -433,17 +409,17 @@ module.exports.changepasswordADMIN = async (req, res, next) => {
           await User.updateOne({ _id: user._id}, { password: hashedPassword });
           
           res.status(200).json({ message: 'password updated successfully' });
-          return; // Add the return statement here to stop execution
+          return; 
         } catch (err) {
-          res.status(400).send(err.message); // Send the error response with status 400
-          return; // Add the return statement here to stop execution
+          res.status(400).send(err.message); 
+          return; 
         }
 
       }
     });
   } else {
-    res.locals.user = null;
-    next();
+   res.status(401).json({ error: 'Unauthorized' });
+   next();
   }   
 };
 

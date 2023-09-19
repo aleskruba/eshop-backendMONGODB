@@ -12,14 +12,12 @@ module.exports.sendMessage_post = async (req, res, next) => {
      if (token) {
       jwt.verify(token, process.env.KEY, async (err, decodedToken) => {
         if (err) {
-          res.locals.user = null;
           next();
         } else {
           try {
             const user = await User.findById(decodedToken.id);
   
-            // Create a new Comment instance using the data from the request
-            const newComment = new Comment({
+              const newComment = new Comment({
               idUser: user._id,
               username: user.firstName,
               image: 'girl2.jpg' ,
@@ -27,8 +25,7 @@ module.exports.sendMessage_post = async (req, res, next) => {
               stars:stars
             });
   
-            // Save the new comment to the database
-            await newComment.save();
+             await newComment.save();
   
             res.status(200).json({ message: 'Message sent successfully' });
           } catch (err) {
@@ -37,8 +34,8 @@ module.exports.sendMessage_post = async (req, res, next) => {
         }
       });
     } else {
-      res.locals.user = null;
-      next(); // Move to the next middleware
+      res.status(401).send({ error: 'Unauthorized' });
+      next(); 
     } 
   };
 

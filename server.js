@@ -12,7 +12,8 @@ const axios = require('axios');
 
 
 const corsOptions = {
-  origin: 'http://localhost:5173', 
+  origin: 'https://lenguaapp2client.onrender.com',
+ // origin: 'http://localhost:5173', 
   credentials: true, 
 };
 

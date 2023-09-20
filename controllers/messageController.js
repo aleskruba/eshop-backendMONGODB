@@ -42,8 +42,10 @@ module.exports.sendMessage_post = async (req, res, next) => {
 
   module.exports.getMessages = async (req, res, next) => { 
 
+
     try {
       const comments = await Comment.find(); 
+      res.send({comments:comments})
       res.status(200).json({ comments }); 
     } catch (err) {
       console.log(err);

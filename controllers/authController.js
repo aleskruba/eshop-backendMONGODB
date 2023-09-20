@@ -26,7 +26,7 @@ module.exports.refresh_token_post = async (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, process.env.KEY);
     const accessToken = createToken(decoded.id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60* 60 * 1000 , domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true});
+    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60* 60 * 1000 , domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None'});
     res.status(200).json({ accessToken });
   } catch (err) {
     res.status(403).json({ message: 'Invalid refresh token' });
@@ -50,8 +50,8 @@ module.exports.signup_post = async (req, res) => {
     const user = await User.create({ email, password });
     const accessToken = createToken(user._id);
     const refreshToken = createRefreshToken(user._id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true });
+    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None' });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true , sameSite: 'None'});
     res.status(201).json({ user: user._id });
   } catch (err) {
     console.log(err);
@@ -67,8 +67,8 @@ module.exports.login_post = async (req, res) => {
     const user = await User.login(data.email, data.password);
     const accessToken = createToken(user._id);
     const refreshToken = createRefreshToken(user._id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true });
+    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None' });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None' });
     res.status(200).json({ user: user._id , userData:user});
   } catch (err) {
     res.status(400).json({ error: 'wrong email or password' }); // Send specific error details
@@ -79,7 +79,7 @@ module.exports.login_post = async (req, res) => {
 
 module.exports.logout_get = (req, res) => {
   try {
-    res.cookie('jwt', '', { maxAge: 1, httpOnly: true, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true });
+    res.cookie('jwt', '', { maxAge: 1, httpOnly: true, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None' });
     res.status(200).json({ message: 'Logout successful' });
   } catch (err) {
     console.log(err);

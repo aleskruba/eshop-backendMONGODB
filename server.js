@@ -6,7 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const app = express();
-
+const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
 const corsOptions = {
  // origin: 'https://eshop-client-s05b.onrender.com',
@@ -29,7 +29,17 @@ app.use(
   })
 );
 
-app.get('/', (req,res)=>{res.send('connected')});
+aapp.get('/', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.send({ products: products });
+  } catch (error) {
+    // Handle any errors here
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 app.use('/api', authRoutes);
 

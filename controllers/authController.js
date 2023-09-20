@@ -26,7 +26,11 @@ module.exports.refresh_token_post = async (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, process.env.KEY);
     const accessToken = createToken(decoded.id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60* 60 * 1000 , domain: 'https://eshop-clientstatic.onrender.com', secure: true, sameSite: 'None'});
+    res.cookie('jwt', accessToken, { httpOnly: true, 
+                                      maxAge: 5 * 24 * 60* 60 * 1000 , 
+                                      secure: true,                          
+                                      sameSite:'none'});
+
     res.status(200).json({ accessToken });
   } catch (err) {
     res.status(403).json({ message: 'Invalid refresh token' });
@@ -50,8 +54,15 @@ module.exports.signup_post = async (req, res) => {
     const user = await User.create({ email, password });
     const accessToken = createToken(user._id);
     const refreshToken = createRefreshToken(user._id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'https://eshop-clientstatic.onrender.com', secure: true, sameSite: 'None' });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'https://eshop-clientstatic.onrender.com', secure: true , sameSite: 'None'});
+    res.cookie('jwt', accessToken, { httpOnly: true, 
+                                     maxAge: 5 * 24 * 60 * 60 * 1000, 
+                                     secure: true, 
+                                     sameSite:'none' });
+
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, 
+                                               maxAge: 7 * 24 * 60 * 60 * 1000, 
+                                               secure: true , 
+                                               sameSite: 'none'});
     res.status(201).json({ user: user._id });
   } catch (err) {
     console.log(err);
@@ -67,8 +78,16 @@ module.exports.login_post = async (req, res) => {
     const user = await User.login(data.email, data.password);
     const accessToken = createToken(user._id);
     const refreshToken = createRefreshToken(user._id);
-    res.cookie('jwt', accessToken, { httpOnly: true, maxAge: 5 * 24 * 60 * 60 * 1000, domain: 'https://eshop-clientstatic.onrender.com', secure: true, sameSite: 'None' });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, domain: 'https://eshop-clientstatic.onrender.com', secure: true, sameSite: 'None' });
+    res.cookie('jwt', accessToken, { httpOnly: true, 
+                                     maxAge: 5 * 24 * 60 * 60 * 1000, 
+                                     secure: true, 
+                                     sameSite: 'none' });
+
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, 
+                                               maxAge: 7 * 24 * 60 * 60 * 1000, 
+                                               secure: true, 
+                                               sameSite: 'none' });
+                                               
     res.status(200).json({ user: user._id , userData:user});
   } catch (err) {
     res.status(400).json({ error: 'wrong email or password' }); // Send specific error details

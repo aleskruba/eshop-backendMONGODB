@@ -87,7 +87,7 @@ module.exports.login_post = async (req, res) => {
                                                maxAge: 7 * 24 * 60 * 60 * 1000, 
                                                secure: true, 
                                                sameSite: 'none' });
-                                               
+
     res.status(200).json({ user: user._id , userData:user});
   } catch (err) {
     res.status(400).json({ error: 'wrong email or password' }); // Send specific error details
@@ -98,7 +98,11 @@ module.exports.login_post = async (req, res) => {
 
 module.exports.logout_get = (req, res) => {
   try {
-    res.cookie('jwt', '', { maxAge: 1, httpOnly: true, domain: 'beautiful-khapse-3fbaec.netlify.app', secure: true, sameSite: 'None' });
+    res.cookie('jwt', '', { maxAge: 1, 
+                            httpOnly: true, 
+                            secure: true, 
+                            sameSite: 'none' });
+
     res.status(200).json({ message: 'Logout successful' });
   } catch (err) {
     console.log(err);

@@ -9,11 +9,10 @@ const app = express();
 const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
 const corsOptions = {
- // origin: 'https://eshop-client-s05b.onrender.com',
- origin: ['http://localhost:5173', 
-          'https://eshop-client-s05b.onrender.com',
+  origin: 'https://eshop-clientstatic.onrender.com',
+/*  origin: ['http://localhost:5173', 
           'https://beautiful-khapse-3fbaec.netlify.app',
-          'https://eshop-clientstatic.onrender.com'],
+          'https://eshop-clientstatic.onrender.com'], */
  credentials: true,
 };
 

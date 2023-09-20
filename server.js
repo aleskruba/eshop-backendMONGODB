@@ -21,7 +21,7 @@ const dbURI = process.env.MONGODB_URI;
 
 app.use(
   session({
-    secret: process.env.SESSION_KEY,
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60000 } // 1 minute (in milliseconds)

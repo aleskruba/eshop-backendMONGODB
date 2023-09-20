@@ -9,7 +9,7 @@ const app = express();
 
 // Use CORS_ORIGIN from the production config
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN,
+  origin: 'https://eshop-client-s05b.onrender.com',
   credentials: true,
 };
 

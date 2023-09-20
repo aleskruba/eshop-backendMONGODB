@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-aapp.get('/', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     const products = await Product.find({});
     res.send({ products: products });

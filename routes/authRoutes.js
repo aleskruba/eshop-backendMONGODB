@@ -6,7 +6,6 @@ const orderController = require('../controllers/orderController');
 const { checkUser,verifyUserResetPassword ,requireAuth,requireADMINAuth} = require('../middleware/authMiddleware');
 const router = Router();
 
-router.get('/', (req,res)=>{res.send('connected')});
 
 router.post('/signup', authController.signup_post);
 router.post('/login', authController.login_post);

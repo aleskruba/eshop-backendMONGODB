@@ -28,6 +28,8 @@ app.use(
   })
 );
 
+app.get('/', (req,res)=>{res.send('connected')});
+
 app.use('/api', authRoutes);
 
 mongoose

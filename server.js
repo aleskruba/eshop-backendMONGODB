@@ -9,8 +9,9 @@ const app = express();
 
 // Use CORS_ORIGIN from the production config
 const corsOptions = {
-  origin: 'https://eshop-client-s05b.onrender.com',
-  credentials: true,
+ // origin: 'https://eshop-client-s05b.onrender.com',
+ origin:' http://localhost:5173/', 
+ credentials: true,
 };
 
 app.use(cors(corsOptions));

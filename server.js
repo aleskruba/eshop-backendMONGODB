@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 const dbURI = process.env.MONGODB_URI;
 
-app.use(
+/* app.use(
   session({
     secret: 'your-secret-key',
     resave: false,
@@ -28,7 +28,7 @@ app.use(
     sameSite: 'none', 
     secure: true,
   })
-);
+); */
 
 app.get('/', async (req, res) => {
   try {

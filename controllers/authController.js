@@ -116,7 +116,7 @@ module.exports.fpassword_post = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const otp = req.session.otp.value;
+    const otp = req.otp.value;
 
     let transporter = nodemailer.createTransport({
       host: 'smtp.centrum.cz',
@@ -154,10 +154,10 @@ module.exports.fpassword_post = async (req, res) => {
 module.exports.verifyOTP_post = async (req, res) => {
   try {
     const { code } = req.body;
-    const storedOTP = req.session.otp;
+    const storedOTP = req.otp;
 
-    if (storedOTP.value === code && Date.now() < storedOTP.expires) {
-      req.session.isAuthenticated = true;
+    if (storedOTP.value === code ) {
+     // req.session.isAuthenticated = true;
       res.status(200).json({ message: 'OTP verified successfully!' });
     } else {
       res.status(401).json({ error: 'Invalid OTP or session expired.' });

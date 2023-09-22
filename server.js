@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const RedisStore = require("connect-redis").default
+const Redis = require('ioredis'); // Add this line
+
 const app = express();
 const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
@@ -20,16 +21,13 @@ app.use(cookieParser());
 
 const dbURI = process.env.MONGODB_URI;
 
+const redisClient = new Redis(process.env.REDIS_URL); // Use the REDIS_URL environment variable
 
-const redisUrl = new URL('redis://red-ck6jeh88elhc73ea8m4g:6379');
-
+// Use express-session with connect-redis
 app.use(
   session({
-    store: new RedisStore({
-      host: redisUrl.hostname,
-      port: parseInt(redisUrl.port),
-      // You may also need to specify authentication if required
-      // pass: 'your-redis-password',
+    store: new (require('connect-redis')(session))({
+      client: redisClient,
     }),
     secret: 'your-secret-key',
     resave: false,
@@ -39,6 +37,7 @@ app.use(
     secure: true,
   })
 );
+
 app.get('/', async (req, res) => {
   try {
     const products = await Product.find({});

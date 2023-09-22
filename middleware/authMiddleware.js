@@ -100,7 +100,7 @@ const checkUser = async (req, res, next) => {
   }
   
 
-
+/* 
   async function verifyUserResetPassword(req, res, next) {
     try {
       const { email } = req.method === "GET" ? req.query : req.body;
@@ -122,6 +122,32 @@ const checkUser = async (req, res, next) => {
       return res.status(404).send({ error: "Authentication Error" });
     }
   }
+ */
+
+  async function verifyUserResetPassword(req, res, next) {
+    try {
+      const { email } = req.method === "GET" ? req.query : req.body;
+  
+      // Generate OTP and set it in req.app.locals
+      const otp = await generateOTP(6);
+  
+      req.app.locals.OTP = otp;
+  
+      // Set the OTP in the session (notice the change here)
+      req.session.otp = { value: otp, expires: Date.now() + 60000 }; // 1 minute
+  
+      // Check the user existence
+      let exist = await User.findOne({ email });
+      if (!exist) return res.status(404).send({ error: "Can't find User!" });
+  
+      // If the user exists and OTP is generated, proceed to the next middleware
+      res.status(201).send({ status: "OK" });
+      next();
+    } catch (error) {
+      return res.status(404).send({ error: "Authentication Error" });
+    }
+  }
+  
 
   
   

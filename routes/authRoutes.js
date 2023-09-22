@@ -3,7 +3,7 @@ const authController = require('../controllers/authController');
 const productController = require('../controllers/productController'); 
 const messageController = require('../controllers/messageController'); 
 const orderController = require('../controllers/orderController'); 
-const { checkUser,verifyUserResetPassword ,requireAuth,requireADMINAuth} = require('../middleware/authMiddleware');
+const { checkUser,requireAuth,requireADMINAuth} = require('../middleware/authMiddleware');
 const router = Router();
 
 

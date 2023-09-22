@@ -126,4 +126,4 @@ const checkUser = async (req, res, next) => {
   
   
 
-  module.exports = {checkUser,verifyUserResetPassword,generateOTP,requireAuth,requireADMINAuth};
+  module.exports = {checkUser,generateOTP,requireAuth,requireADMINAuth};

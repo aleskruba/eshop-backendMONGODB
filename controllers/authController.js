@@ -152,7 +152,20 @@ module.exports.fpassword_post = async (req, res) => {
 
 
 module.exports.verifyOTP_post = async (req, res) => {
+    const { code } = req.body;
+    const storedOTP = req.session.otp;
+
   try {
+
+    res.status(200).json({ message: code, storedOTP });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: 'Internal server error' });
+  } 
+
+
+/*   try {
     const { code } = req.body;
     const storedOTP = req.session.otp;
 
@@ -165,7 +178,9 @@ module.exports.verifyOTP_post = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal server error' });
-  }
+  } */
+
+
 };
 
 

@@ -45,12 +45,12 @@ module.exports.sendMessage_post = async (req, res, next) => {
 
     try {
       const comments = await Comment.find(); 
-      res.send({comments:comments})
-      res.status(200).json({ comments }); 
+      res.status(200).json({ comments });
     } catch (err) {
       console.log(err);
       res.status(500).json({ error: 'An error occurred while fetching products.' });
     }
+    
 
 
   }

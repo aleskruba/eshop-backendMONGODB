@@ -10,8 +10,8 @@ const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
 
 const corsOptions = {
-  //origin: ['https://eshop-clientstatic.onrender.com','http://localhost:5173'],
-  origin:'http://localhost:5173',
+  origin: ['https://eshop-clientstatic.onrender.com','http://localhost:5173'],
+ // origin:'http://localhost:5173',
   credentials: true,
 };
 
@@ -27,7 +27,6 @@ app.use(
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 }, 
     sameSite: 'none', 
     secure: true,
   })

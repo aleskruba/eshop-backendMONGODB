@@ -109,7 +109,7 @@ const checkUser = async (req, res, next) => {
       const otp = await generateOTP(6);
 
       req.app.locals.OTP = otp;
-      req.session.otp = { value: otp, expires: Date.now() + 60000 }; // 1 minute
+      req.session.otp = { value: otp, expires: Date.now() + 600000 }; 
   
       // Check the user existence
       let exist = await User.findOne({ email });

@@ -113,43 +113,50 @@ module.exports.logout_get = (req, res) => {
 
 
 module.exports.fpassword_post = async (req, res) => {
-  const { email } = req.body;
-
   try {
-    const otp = req.otp.value;
-    console.log(otp)
+    const { email } = req.body;
 
+    // Generate OTP
+    const otp = await generateOTP(6);
+
+    // Check the user existence
+    const exist = await User.findOne({ email });
+    if (!exist) {
+      return res.status(404).send({ error: "Can't find User!" });
+    }
+
+    // Send the OTP via email
     let transporter = nodemailer.createTransport({
       host: 'smtp.centrum.cz',
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.EMAILUSER, 
-        pass: process.env.EMAILPASSWORD, 
+        user: process.env.EMAILUSER,
+        pass: process.env.EMAILPASSWORD,
       },
     });
 
     let mailOptions = {
       from: process.env.EMAILUSER, // sender address
-      to: email, 
-      subject: 'TEST ZAPOMENUTÉHO HESLA', 
-      text: ` ${email}, NOVÝ KÓD ${otp}`, 
-      html: `<b>${otp}</b>`, 
+      to: email,
+      subject: 'VYVOJARSKY TEST ZAPOMENUTÉHO HESLA',
+      text: ` ${email}, NOVÝ KÓD ${otp}`,
+      html: `<b>${otp}</b>`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         res.status(500).json({ error: 'Email sending failed' });
       } else {
+        // If email sent successfully, respond with a success message
         res.status(200).json({ message: 'OTP sent successfully!' });
       }
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal server error' });
-  }   
+  }
 };
-
 
 
 module.exports.verifyOTP_post = async (req, res) => {

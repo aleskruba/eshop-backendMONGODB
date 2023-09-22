@@ -10,7 +10,8 @@ const router = Router();
 router.post('/signup', authController.signup_post);
 router.post('/login', authController.login_post);
 router.get('/logout', authController.logout_get);
-router.post('/fpassword', verifyUserResetPassword,authController.fpassword_post);
+router.post('/fpassword', authController.fpassword_post);
+
 router.post('/verifyOTP',authController.verifyOTP_post) 
 router.post('/resetpassword',authController.resetPassword_post) 
 router.post('/changepassword',requireAuth,authController.changePassword_post) 

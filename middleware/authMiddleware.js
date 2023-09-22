@@ -100,7 +100,7 @@ const checkUser = async (req, res, next) => {
   }
   
 
-
+/* 
   async function verifyUserResetPassword(req, res, next) {
     try {
       const { email } = req.method === "GET" ? req.query : req.body;
@@ -121,7 +121,7 @@ const checkUser = async (req, res, next) => {
     } catch (error) {
       return res.status(404).send({ error: "Authentication Error" });
     }
-  }
+  } */
 
   
   

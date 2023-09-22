@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 const app = express();
 const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
@@ -19,17 +20,25 @@ app.use(cookieParser());
 
 const dbURI = process.env.MONGODB_URI;
 
+
+const redisUrl = new URL('redis://red-ck6jeh88elhc73ea8m4g:6379');
+
 app.use(
   session({
+    store: new RedisStore({
+      host: redisUrl.hostname,
+      port: parseInt(redisUrl.port),
+      // You may also need to specify authentication if required
+      // pass: 'your-redis-password',
+    }),
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 }, 
-    sameSite: 'none', 
+    cookie: { maxAge: 60000 },
+    sameSite: 'none',
     secure: true,
   })
 );
-
 app.get('/', async (req, res) => {
   try {
     const products = await Product.find({});

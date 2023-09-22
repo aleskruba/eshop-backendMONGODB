@@ -154,10 +154,12 @@ module.exports.fpassword_post = async (req, res) => {
 module.exports.verifyOTP_post = async (req, res) => {
     const { code } = req.body;
     const storedOTP = req.session.otp;
+    console.log(code)
+    console.log(storedOTP)
 
   try {
 
-    res.status(200).json({ message: code, storedOTP });
+    res.status(200).json({ message: code== storedOTP});
 
   } catch (err) {
     console.log(err);

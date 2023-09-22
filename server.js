@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require("connect-redis").default
 const app = express();
 const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config

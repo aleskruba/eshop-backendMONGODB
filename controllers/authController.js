@@ -117,6 +117,7 @@ module.exports.fpassword_post = async (req, res) => {
 
   try {
     const otp = req.otp.value;
+    console.log(otp)
 
     let transporter = nodemailer.createTransport({
       host: 'smtp.centrum.cz',

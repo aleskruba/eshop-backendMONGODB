@@ -100,7 +100,7 @@ const checkUser = async (req, res, next) => {
   }
   
 
-/* 
+
   async function verifyUserResetPassword(req, res, next) {
     try {
       const { email } = req.method === "GET" ? req.query : req.body;
@@ -109,7 +109,7 @@ const checkUser = async (req, res, next) => {
       const otp = await generateOTP(6);
 
       req.app.locals.OTP = otp;
-   //   req.session.otp = { value: otp, expires: Date.now() + 60000 }; // 1 minute
+      req.session.otp = { value: otp, expires: Date.now() + 60000 }; // 1 minute
   
       // Check the user existence
       let exist = await User.findOne({ email });
@@ -121,9 +121,9 @@ const checkUser = async (req, res, next) => {
     } catch (error) {
       return res.status(404).send({ error: "Authentication Error" });
     }
-  } */
+  }
 
   
   
 
-  module.exports = {checkUser,generateOTP,requireAuth,requireADMINAuth};
+  module.exports = {checkUser,verifyUserResetPassword,generateOTP,requireAuth,requireADMINAuth};

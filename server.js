@@ -8,10 +8,13 @@ const session = require('express-session');
 const app = express();
 const Product = require("./models/Product");
 // Use CORS_ORIGIN from the production config
+
 const corsOptions = {
-  origin: ['https://eshop-clientstatic.onrender.com','http://localhost:5173'],
+  //origin: ['https://eshop-clientstatic.onrender.com','http://localhost:5173'],
+  origin:'http://localhost:5173',
   credentials: true,
 };
+
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -19,7 +22,7 @@ app.use(cookieParser());
 
 const dbURI = process.env.MONGODB_URI;
 
-/* app.use(
+app.use(
   session({
     secret: 'your-secret-key',
     resave: false,
@@ -28,7 +31,7 @@ const dbURI = process.env.MONGODB_URI;
     sameSite: 'none', 
     secure: true,
   })
-); */
+);
 
 app.get('/', async (req, res) => {
   try {

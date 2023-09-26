@@ -5,8 +5,6 @@ const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 
-const Redis = require('ioredis'); // Import ioredis
-const redis = new Redis('redis://red-ck6jeh88elhc73ea8m4g:6379');
 
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.KEY, {
@@ -114,7 +112,7 @@ module.exports.logout_get = (req, res) => {
 
 
 
-/* module.exports.fpassword_post = async (req, res) => {
+module.exports.fpassword_post = async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -149,49 +147,11 @@ module.exports.logout_get = (req, res) => {
     console.log(err);
     res.status(500).json({ error: 'Internal server error' });
   }   
-}; */
-
-
-module.exports.fpassword_post = async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const otp = await req.redis.get(`otp:${email}`);
-
-    let transporter = nodemailer.createTransport({
-      host: 'smtp.centrum.cz',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAILUSER,
-        pass: process.env.EMAILPASSWORD,
-      },
-    });
-
-    let mailOptions = {
-      from: process.env.EMAILUSER,
-      to: email,
-      subject: 'TEST ZAPOMENUTÉHO HESLA',
-      text: `${email}, NOVÝ KÓD ${otp}`,
-      html: `<b>${otp}</b>`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        res.status(500).json({ error: 'Email sending failed' });
-      } else {
-        res.status(200).json({ message: 'OTP sent successfully!' });
-      }
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 };
 
 
 
-/* module.exports.verifyOTP_post = async (req, res) => {
+module.exports.verifyOTP_post = async (req, res) => {
     const { code } = req.body;
     const storedOTP = req.session.otp;
     console.log(code)
@@ -207,7 +167,7 @@ module.exports.fpassword_post = async (req, res) => {
   } 
 
 
-   try {
+/*   try {
     const { code } = req.body;
     const storedOTP = req.session.otp;
 
@@ -220,36 +180,9 @@ module.exports.fpassword_post = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal server error' });
-  } 
+  } */
 
 
-};
- */
-
-
-module.exports.verifyOTP_post = async (req, res) => {
-  const { code } = req.body;
-
-  // First, check if the OTP is available in the new Redis-based storage
-  const { email } = req.body; // Assuming you have the email associated with the OTP
-  const storedRedisOTP = await req.redis.get(`otp:${email}`);
-
-  if (storedRedisOTP && storedRedisOTP === code) {
-    // OTP is valid in Redis storage
-    res.status(200).json({ message: 'OTP verified successfully!' });
-  } else {
-    // OTP not found or invalid in Redis storage, check the old session-based storage
-    const storedSessionOTP = req.session.otp;
-
-    if (storedSessionOTP && storedSessionOTP.value === code && Date.now() < storedSessionOTP.expires) {
-      // OTP is valid in the session-based storage
-      req.session.isAuthenticated = true;
-      res.status(200).json({ message: 'OTP verified successfully!' });
-    } else {
-      // Invalid OTP in both storage or session expired
-      res.status(401).json({ error: 'Invalid OTP or session expired.' });
-    }
-  }
 };
 
 

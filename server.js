@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const session = require('express-session');
 const Redis = require('ioredis'); // Import ioredis
+const connectRedis = require('connect-redis');
 
 const app = express();
 const Product = require("./models/Product");
@@ -19,6 +20,7 @@ const corsOptions = {
 };
 
 const redis = new Redis('redis://red-ck6jeh88elhc73ea8m4g:6379');
+const RedisStore = connectRedis(session);
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -45,22 +47,18 @@ app.use(
 
 // Replace the 'host' and 'port' with your Redis URL
 
-
 app.use(
   session({
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: new (require('connect-redis')(session))({
-      client: redis,
-    }), // Use ioredis as the session store
+    store: new RedisStore({ client: redis }), // Use ioredis as the session store
     cookie: {
       sameSite: 'none',
       secure: true,
     },
   })
 );
-
 
 
 app.get('/', async (req, res) => {

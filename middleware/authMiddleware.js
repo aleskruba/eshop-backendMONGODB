@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const otpGenerator = require('otp-generator');
 
-
+const Redis = require('ioredis'); // Import ioredis
+const redis = new Redis('redis://red-ck6jeh88elhc73ea8m4g:6379');
 
 const requireAuth = async (req, res, next) => {
   const token = req.cookies.jwt;
@@ -101,7 +102,7 @@ const checkUser = async (req, res, next) => {
   
 
 
-  async function verifyUserResetPassword(req, res, next) {
+/*   async function verifyUserResetPassword(req, res, next) {
     try {
       const { email } = req.method === "GET" ? req.query : req.body;
   
@@ -122,8 +123,29 @@ const checkUser = async (req, res, next) => {
       return res.status(404).send({ error: "Authentication Error" });
     }
   }
-
+ */
   
+  async function verifyUserResetPassword(req, res, next) {
+    try {
+      const { email } = req.method === "GET" ? req.query : req.body;
   
+      // Generate OTP
+      const otp = await generateOTP(6);
+  
+      // Store OTP in Redis
+      await req.redis.set(`otp:${email}`, otp, 'EX', 600); // Expires in 600 seconds (10 minutes)
+  
+      // Check the user existence
+      let exist = await User.findOne({ email });
+      if (!exist) return res.status(404).send({ error: "Can't find User!" });
+  
+      // If the user exists and OTP is generated, proceed to the next middleware
+      req.app.locals.OTP = otp;
+      res.status(201).send({ status: "OK" });
+      next();
+    } catch (error) {
+      return res.status(404).send({ error: "Authentication Error" });
+    }
+  }
 
   module.exports = {checkUser,verifyUserResetPassword,generateOTP,requireAuth,requireADMINAuth};

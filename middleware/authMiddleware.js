@@ -4,6 +4,7 @@ const otpGenerator = require('otp-generator');
 
 
 
+
 const requireAuth = async (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
@@ -101,7 +102,7 @@ const checkUser = async (req, res, next) => {
   
 
 
-  async function verifyUserResetPassword(req, res, next) {
+/*   async function verifyUserResetPassword(req, res, next) {
     try {
       const { email } = req.method === "GET" ? req.query : req.body;
   
@@ -123,6 +124,37 @@ const checkUser = async (req, res, next) => {
     }
   }
 
+   */
+
+
+  
+  async function verifyUserResetPassword(req, res, next) {
+  
+    try {
+      const { email } = req.method === 'GET' ? req.query : req.body;
+  
+      let exist = await User.findOne({ email });
+        if (!exist) return res.status(404).send({ error: "Can't find User!" });
+
+      // Generate OTP
+      const otp = await generateOTP(6);
+      
+      const forgottenPasswordToken = jwt.sign({ email, otp }, process.env.KEY, { expiresIn: '2m' });
+  
+      res.cookie('jwtfp', forgottenPasswordToken, { httpOnly: true, 
+        maxAge: 120 * 1000, 
+        secure: true, 
+        sameSite: 'none' });
+
+      res.locals.forgottenPasswordToken = { otp };
+
+      res.status(201).json({ status: 'OK', forgottenPasswordToken });
+      next();
+    } catch (error) {
+      return res.status(404).send({ error: 'Authentication Error' });
+    }
+  }
+  
   
   
 
